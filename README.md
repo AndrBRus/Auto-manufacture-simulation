@@ -1,0 +1,1 @@
+sim_auto_manufacture
