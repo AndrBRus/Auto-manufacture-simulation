@@ -1,0 +1,23 @@
+PARTS DATA:
+wl_raw_materials: [1000, 500, 250, 1, 0.0025, 2.5, 300]
+wl_consumables: [500, 250, 100, 1, 0.0003, 3, 200]
+cl_raw_materials: [700, 300, 200, 2, 0.00045, 5.5, 400]
+cl_consumables: [550, 150, 50, 2, 0.000007, 10.5, 500]
+as_raw_materials: [1500, 700, 500, 3, 0.000067, 3.5, 1400]
+as_consumables: [600, 300, 100, 3, 0.0004, 7.5, 600]
+
+
+CONFIG DATA:
+Probability of manufacture defect: 0.0007
+Probability of fixing a manufacturing defect: 0.000065
+Time to fixing a manufacture defect (hours): 5.5
+Probability of details defect: 0.000026
+Days of production: 5
+Change time (hours): 7.25
+Time interval (minutes): 30
+Time at welding (hours): 6
+Time at coloring (hours): 6
+Conveyor length (meters): 2500
+Conveyor speed (meters/h): 165
+Car length (meters): 4.3
+Distance between cars (meters): 0.7
