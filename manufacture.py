@@ -8,6 +8,7 @@ from car import car # import car class with info about car on conveyor
 from conveyor import conveyor # import conveyor class with info about conveyor at usine
 import os # use for search path to file
 import sys # use to system definitions
+import time # use for naming logs files 
 
 # This module describes the process of car production.
 
@@ -65,16 +66,16 @@ class manufacture(object):
     # This function describes the production process 
     # for a selected interval specified in the "config_data" class.
     def manufacture_process(self):
-       # search path to folder of program
+        # search path to folder of program
         path =  str(os.path.dirname(os.path.abspath('manufacture.py')))
         # if Linux or MAC OS system
         if sys.platform == 'darwin' or sys.platform == 'linux':
-            path += '/'
+            path += '/logs/'
         # if Windows system
         elif sys.platform == 'win32':
-            path += '\\'
-         # create a file into which production data will be logged for subsequent analysis
-        with open(path + 'logs.txt', 'w+') as file:
+            path += '\\logs\\'
+        # create a file into which production data will be logged for subsequent analysis
+        with open(path + 'logs' + ' ' + time.ctime() + '.txt', 'a+') as file:
             with contextlib.redirect_stdout(file): # redirect the output to a log file
                 # for all interval
                 while (self.time_days_production / (self.config_data.change_time * 2 * 60)) < self.config_data.days_of_production:
@@ -100,7 +101,13 @@ class manufacture(object):
                     print() # testing
     
     # This function displays the number of cars produced, the expected number of cars and the performance ratio (cars built / expected number of cars)
-    def car_revenue(self):
+    # Variable "type_test" - variable to indicate the type of simulation
+    def car_revenue(self, type_test='once'):
         # number of expected cars that usine need to product
         expected_cars = round((self.config_data.days_of_production * (self.config_data.change_time * 2) - (self.config_data.change_time * 2)) / (self.config_data.conveyor_length / (self.config_data.conveyor_speed * 1000)) * self.config_data.max_car)
-        print('\nCars produced: {}, expected to produce: {}, performance ratio: {}'.format(self.ready_cars, expected_cars, (self.ready_cars / expected_cars)))
+        # if we have a single modeling process, then print all data to command line
+        if type_test == 'once':
+            print('\nCars produced: {}, expected to produce: {}, performance ratio: {}'.format(self.ready_cars, expected_cars, (self.ready_cars / expected_cars)))
+        # if we have a complete simulation, then we return number of produced cars and perfomance ration of manufacture (for further calculations)
+        if type_test == 'full':
+            return (self.ready_cars, (self.ready_cars / expected_cars))

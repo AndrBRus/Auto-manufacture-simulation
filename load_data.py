@@ -40,7 +40,8 @@ INPUT_CONFIG_PRINT = [
     'Conveyor length (meters): ',
     'Conveyor speed (meters/h): ',
     'Car length (meters): ',
-    'Distance between cars (meters): '
+    'Distance between cars (meters): ',
+    'Number of tests:  '
 ]
 
 # this function loads configuration data
