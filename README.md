@@ -1,5 +1,4 @@
 # Simulation of the production process of a car factory 
-========================================================
 **Auto-manufacture-simulation** repository describes a program that simulates the production cycle of an assembly line in an automobile factory.
 
 At the moment, the program can simulate as a single process (performing one test) or simulation a certain number of times (specified by the user), including finding the average value for produced cars, the coefficient of performance.
@@ -29,7 +28,7 @@ The main principle of the program is to simulate a conveyor based on configurati
 
 Also during these intervals, parts are checked for defects and the availability of spare parts in stock. If there are none, then a shortage of parts is simulated, and a new delivery is expected. After the car is ready, it rolls off the assembly line and is considered to be ready. Manufacturing defects are also taken into account. If it can be corrected, the car is removed from the conveyor and the defect is corrected, otherwise the body is recycled.
 
-Please note that there is test data that is in the *"test_data.txt"* file. You can use in the first steps of learning this program for a better understanding of what is happening in it
+Please note that there is test data that is in the *"test_data.txt"* file. You can use in the first steps of learning this program for a better understanding of what is happening in it.
 
 You can find the necessary libraries for the program to work in the *"requirements.txt"* file.
 
