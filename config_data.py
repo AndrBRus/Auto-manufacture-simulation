@@ -4,7 +4,7 @@
 # needed to simulate the production process.
 class config_data(object):
     # class constructor
-    def __init__(self, p_manufacture_defect, resolve_manufacture_defect, time_to_resolve_manufacture_defect, p_detail_defect, days_of_production, change_time, u_time_interval, welding_time, coloring_time, conveyor_length, conveyor_speed, car_length, distance_cars, numb_tests=1):
+    def __init__(self, p_manufacture_defect, resolve_manufacture_defect, time_to_resolve_manufacture_defect, p_detail_defect, days_of_production, change_time, u_time_interval, welding_time, coloring_time, conveyor_length, conveyor_speed, car_length, distance_cars, strategy, numb_tests=1, strategy_check_time = None):
         self.change_time = change_time # time of one change at produciton
         self.u_time_interval = u_time_interval # user time interval (the interval in which the data in the file will be logged)
         self.p_manufacture_defect = p_manufacture_defect    # the likelihood of a manufacturing defect (common to all phases of production)
@@ -22,4 +22,6 @@ class config_data(object):
         self.time_to_resolve_manufacture_defect = time_to_resolve_manufacture_defect # time of a detail defect correction (common to all details)
         self.interval_add_conveyor = (self.car_length + self.distance_between_cars * 2) / ((self.conveyor_speed * 1000) / 60) # the interval of the appearance of the machine on the conveyor
         self.time_interval = (self.car_length + self.distance_between_cars * 2) / ((self.conveyor_speed * 1000) / 60)  # period of time in which the production check will be carried out
+        self.strategy = strategy # type of strategy: 'B' - buy yesterday, 'SS' - minimum-maximum capacity strategy, 'U' - user level of capacity
         self.numb_tests = int(numb_tests) # number of trials (number of repetitions over the selected interval)
+        self.strategy_check_time = strategy_check_time # check time when using the strategy with intervals (default "None" for other strategies)

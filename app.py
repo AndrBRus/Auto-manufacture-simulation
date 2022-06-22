@@ -1,107 +1,17 @@
-from itertools import product
-from math import prod
-from delete_logs import delete_logs
-import simpy # this module uses to simulate production process
-from config_data import config_data # import config_data class with configuration data 
-from parts_data import parts_data # import parts_data class with info about all parts
-from car import car # import car class with info about car on conveyor
-from conveyor import conveyor # import conveyor class with info about conveyor at usine
-from manufacture import manufacture # import manufacture class with manufacture process at usine
-from load_data import load_parts_data, load_config_data # import from load_data module load functions
-from delete_logs import delete_logs # import from delete_logs module function for delete all logs flies from logs folder
-import os 
-
-# It's main module, that prints menu and main actions
+from command_line_app import start_command_line_app
+from gui_app import start_gui_app
+import argparse
 
 if __name__ == '__main__':
 
-    action = None # variable for input user action ("-1" - stabdard value)
-    parts = parts_data() # empty class for future use
-    config = None # for next use in manufacture class
-    
-    while action != '0': # print menu until exit from program
-        print('\nMAIN MENU\n')
-        print('0. {}\n1. {}\n2. {}\n3. {}\n'.format('Exit', 'Load data', 'Modeling (once)', 'Full modeling'))
-        
-        try: # try to transofm to int
-            action = input('Input action: ') # input action
-        
-        except ValueError: # if input not a number
-                print('\nUnknown command!')
-                pass # go to the next iteration
+    parser = argparse.ArgumentParser(description='Parsing command line arguments for start command line mode or gui mode')
+    parser.add_argument('--cmd', action='store_true', default=False, help='Start app at command line mode')
+    parser.add_argument('--gui', action='store_true', default=False, help='start app at gui mode')
+    args = parser.parse_args()
 
-        if action == '0': # exit program
-            print('\nExiting program...\n')
-            break
-        
-        elif action == '1': # print "loading data" menu
-            while action != None: # while no exit from menu
-                print('\nLOADING DATA MENU\n')
-                print('0. {}\n1. {}\n2. {}\n3. {}\n'.format('Return to main menu', 'Load parts data', 'Load config data', 'Test data'))
-
-                action = input('Input action: ') # input additional action (for "loading data" menu)
-
-                if action == '0': # if exit
-                    action = None # standard value for action
-                    pass # pass to the next iteration
-                elif action == '1': # load parts data
-                    load_parts_data(parts)
-                elif action == '2': # load config data
-                    config = config_data(*load_config_data())
-                elif action == '3': # test data 
-                    config = config_data(0.0007, 0.000065, 5.5, 0.000026, 5, 7.25, 30, 6, 6, 2500, 0.165, 4.3, 0.7, 100)
-                    parts.get_data('wl_raw_materials', [1000, 500, 250, 1, 0.0025, 2.5, 300])
-                    parts.get_data('wl_consumables', [500, 250, 100, 1, 0.0003, 3, 200])
-                    parts.get_data('cl_raw_materials', [700, 300, 200, 2, 0.00045, 5.5, 400])
-                    parts.get_data('cl_consumables', [550, 150, 50, 2, 0.000007, 10.5, 500])
-                    parts.get_data('as_raw_materials', [1500, 700, 500, 3, 0.000067, 3.5, 1400])
-                    parts.get_data('as_consumables', [600, 300, 100, 3, 0.0004, 7.5, 600])
-                    print('\nData loaded!')
-                else: # if a different value is entered that is not listed in the menu
-                    print('\nUnknown command!')
-
-        elif action == '2': # if modeling production process 
-            delete_logs() # delete all logs files before start modeling
-
-            manufacture_env = simpy.Environment() # create env for manufacture timer 
-            manufacture_process = manufacture(manufacture_env, conveyor(), parts, config)   # create a class 
-            # start manufacture process
-            manufacture_process.manufacture_process()
-            # print revenue of product
-            manufacture_process.car_revenue()
-        
-        elif action == '3':
-            delete_logs() # delete all logs files before start modeling
-
-            manufacture_env = simpy.Environment() # create env for manufacture timer
-            
-            production_data = list() # create empty list for data about all modeling processes
-            # we carry out tests (the number of tests is specified by the user)
-            for iter in range(0, config.numb_tests + 1):
-                manufacture_process = manufacture(manufacture_env, conveyor(), parts, config) # create a class (the class is re-created for each test for a new generation of random variables)
-                manufacture_process.manufacture_process() # start manufacture process
-                production_data.append(manufacture_process.car_revenue('full')) # add to list data about end result of the simulation
-
-            # variables for average number of produced cars and average perfomance ratio
-            average_ready_cars = 0
-            average_perfomance_ratio = 0
-            # sum all values in production_data list
-            for iter in range(0, len(production_data)):
-                average_ready_cars += production_data[iter][0]
-                average_perfomance_ratio += production_data[iter][1]
-            # find average values for this two variables
-            average_perfomance_ratio /= len(production_data)
-            # convert average number of produced cars to an integer, 
-            # since only an integer number of cars can be produced
-            average_ready_cars = int(average_ready_cars / len(production_data))
-            # find number of expected cars for modeling test (the same for everyone)
-            expected_cars = round((config.days_of_production * (config.change_time * 2) - (config.change_time * 2)) / (config.conveyor_length / (config.conveyor_speed * 1000)) * config.max_car)
-            
-            # print all data to command line
-            print('Average values for {} days of {} test modeling processes'.format(config.days_of_production, config.numb_tests))
-            print('Average number of produced cars: {}'.format(average_ready_cars))
-            print('Expected number of cars for all tests: {}'.format(expected_cars))
-            print('Average perfomance ration: {}'.format(average_perfomance_ratio))
-            
-        else: # if a different value is entered that is not listed in the menu
-            print('\nUnknown command!')
+    if args.cmd == True and args.gui == False:
+        start_command_line_app()
+    elif (args.gui == True and args.cmd == False) or (args.cmd == False and args.gui == False): 
+        start_gui_app()
+    else:
+        print('Too many command line arguments!\nEnter one argument')

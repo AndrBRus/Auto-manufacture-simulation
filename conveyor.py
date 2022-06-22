@@ -2,6 +2,9 @@
 
 # This class describes the conveyor,
 # also all the functions that it can perform.
+import site
+
+
 class conveyor(object):
     # class constructor 
     def __init__(self):
@@ -14,10 +17,11 @@ class conveyor(object):
     def status(self):
         return self.work_status
     
-    # return status of number of cars now on conveyor
+    # return status of number of all cars (also with "MD" and "DS" status)
     def numb_cars(self):
         return len(self.cars_on_conveyor)
-    
+        
+    # return status of number of cars now on conveyor
     def numb_cars_on_conveyor(self):
         numb_cars = 0
         for iter in range(0, len(self.cars_on_conveyor)):
@@ -63,12 +67,12 @@ class conveyor(object):
         if type(self.stop_detail) == type(list()):
             # for each detail in stopping list
             for iter in self.stop_detail:
-                parts_data.parts_dict[iter][0] += parts_data.parts_dict[iter][6]  # delivery parts to warehouse
+                parts_data.parts_dict[iter][0] += parts_data.parts_dict[iter][7]  # delivery parts to warehouse
             # cancellation of a stopping details list 
             self.stop_details = list()
         # if one detail in stopping list
         else:
-            parts_data.parts_dict[self.stop_detail][0] += parts_data.parts_dict[self.stop_detail][6] # delivery parts to warehouse
+            parts_data.parts_dict[self.stop_detail][0] += parts_data.parts_dict[self.stop_detail][7] # delivery parts to warehouse
     
     # this function is reduce stop time and starts conveyor if stop time is up
     def edit_stop_time(self, time_interval, parts_data):
@@ -76,7 +80,18 @@ class conveyor(object):
         # if stop time is up
         if self.stop_time <= 0:
             self.start(parts_data) # start conveyor
-    
+   
+    # counting the number of cars in each section
+    def numb_cars_site(self):
+        site_numb_cars = {'WL': 0, 'CL': 0, 'AS': 0, 'DS': 0, 'RC': 0, 'MD': 0} # a dictionary with each lot and the number of cars on it
+        # walk through each machine and check by status
+        for iter in self.cars_on_conveyor:
+            for key in site_numb_cars.keys():
+                if iter.status == key:
+                    site_numb_cars[key] += 1
+        # return dictionary with all sites
+        return site_numb_cars
+
     # this function checks for finished machines or machines for disposal
     def ready_disposal_cars(self):
         # iterating through the whole list

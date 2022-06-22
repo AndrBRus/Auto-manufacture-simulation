@@ -21,7 +21,8 @@ class car(object):
     #   - MD - manufacture defect
     #   - DS - disposal body
     #   - RC - ready car
-    def edit_data(self, parts_data, config_data, conveyor):
+    # work_time - pipeline operation time, check_time - check interval to interval strategy
+    def edit_data(self, parts_data, config_data, conveyor, work_time, check_time):
         manufacture_detail_defect = random.random() # generate random variable for detail defect at conveyor
         manufacture_defect = random.random() # generate random variable for manufacture defect at conveyor
         resolve_manufacture_defect = random.random() # generate random variable for is it possible to correct a manufacturing defect
@@ -35,25 +36,25 @@ class car(object):
                     # iterate twice to deduct for two parts
                     for iter in range(0, 2):
                         # check if production have details at warehouse
-                        wl_second_check = parts_data.check_pack('wl_raw_materials', 'wl_consumables')
+                        wl_second_check = parts_data.check_pack('wl_raw_materials', 'wl_consumables', work_time, check_time)
                         # if production have details at warehouse
                         if wl_second_check[0]:
                             self.time_on_conveyor += config_data.time_interval  # add time on conveyor
                             self.status = 'WL'  # set status
-                            parts_data.parts_dict['wl_raw_materials'][0] -= parts_data.parts_dict['wl_raw_materials'][2] # spend materials for a defective part and for the one that was used in production
-                            parts_data.parts_dict['wl_consumables'][0] -= parts_data.parts_dict['wl_consumables'][2] # spend materials for a defective part and for the one that was used in production
+                            parts_data.parts_dict['wl_raw_materials'][0] -= parts_data.parts_dict['wl_raw_materials'][3] # spend materials for a defective part and for the one that was used in production
+                            parts_data.parts_dict['wl_consumables'][0] -= parts_data.parts_dict['wl_consumables'][3] # spend materials for a defective part and for the one that was used in production
                         # if no details at warehouse
                         else:
                             conveyor.stop(parts_data, wl_second_check[1])   # stop conveyor
                 else:
                     # check if production have details at warehouse
-                    wl_second_check = parts_data.check_pack('wl_raw_materials', 'wl_consumables')
+                    wl_second_check = parts_data.check_pack('wl_raw_materials', 'wl_consumables', work_time, check_time)
                     # if production have details at warehouse
                     if wl_second_check[0]:
                         self.time_on_conveyor += config_data.time_interval  # add time on conveyor
                         self.status = 'WL'  # set status
-                        parts_data.parts_dict['wl_raw_materials'][0] -= parts_data.parts_dict['wl_raw_materials'][2] # spend materials for a part and for that was used in production
-                        parts_data.parts_dict['wl_consumables'][0] -= parts_data.parts_dict['wl_consumables'][2] # spend materials for a part that was used in production
+                        parts_data.parts_dict['wl_raw_materials'][0] -= parts_data.parts_dict['wl_raw_materials'][3] # spend materials for a part and for that was used in production
+                        parts_data.parts_dict['wl_consumables'][0] -= parts_data.parts_dict['wl_consumables'][3] # spend materials for a part that was used in production
                     # if no details at warehouse
                     else:
                         conveyor.stop(parts_data, wl_second_check[1])   # stop conveyor
@@ -81,26 +82,26 @@ class car(object):
                             # iter two 
                             # iterate twice to deduct for two parts
                             for iter in range(0, 2):
-                                cl_check = parts_data.check_pack('cl_raw_materials', 'cl_consumables')  # check details at warehouse
+                                cl_check = parts_data.check_pack('cl_raw_materials', 'cl_consumables', work_time, check_time)  # check details at warehouse
                                 # if details at warehouse
                                 if cl_check[0]:
                                     self.time_on_conveyor += config_data.time_interval  # add time to time on conveyor of car
                                     self.status = 'CL'  # change car to coloring stage
-                                    parts_data.parts_dict['cl_raw_materials'][0] -= parts_data.parts_dict['cl_raw_materials'][2] # spend materials for a defective part and for the one that was used in production
-                                    parts_data.parts_dict['cl_consumables'][0] -= parts_data.parts_dict['cl_consumables'][2] # spend materials for a defective part and for the one that was used in production
+                                    parts_data.parts_dict['cl_raw_materials'][0] -= parts_data.parts_dict['cl_raw_materials'][3] # spend materials for a defective part and for the one that was used in production
+                                    parts_data.parts_dict['cl_consumables'][0] -= parts_data.parts_dict['cl_consumables'][3] # spend materials for a defective part and for the one that was used in production
                                 # if details aren't at warehouse
                                 else:
                                     conveyor.stop(parts_data, cl_check[1]) # stop conveyor
                         # if no defect parts at coloring 
                         else:
                             # check if production have details at warehouse
-                            cl_check = parts_data.check_pack('cl_raw_materials', 'cl_consumables')
+                            cl_check = parts_data.check_pack('cl_raw_materials', 'cl_consumables', work_time, check_time)
                             # if production have details at warehouse
                             if cl_check[0]:
                                 self.time_on_conveyor += config_data.time_interval  # add time on conveyor
                                 self.status = 'CL'  # set status
-                                parts_data.parts_dict['cl_raw_materials'][0] -= parts_data.parts_dict['cl_raw_materials'][2] # spend materials for a part and for that was used in production
-                                parts_data.parts_dict['cl_consumables'][0] -= parts_data.parts_dict['cl_consumables'][2] # spend materials for a part that was used in production
+                                parts_data.parts_dict['cl_raw_materials'][0] -= parts_data.parts_dict['cl_raw_materials'][3] # spend materials for a part and for that was used in production
+                                parts_data.parts_dict['cl_consumables'][0] -= parts_data.parts_dict['cl_consumables'][3] # spend materials for a part that was used in production
                             # if no details at warehouse
                             else:
                                 conveyor.stop(parts_data, cl_check[1])   # stop conveyor
@@ -110,26 +111,26 @@ class car(object):
                         if manufacture_detail_defect < config_data.p_detail_defect:
                             # iterate twice to deduct for two parts
                             for iter in range(0, 2):
-                                as_check = parts_data.check_pack('as_raw_materials', 'as_consumables') # check details at warehouse
+                                as_check = parts_data.check_pack('as_raw_materials', 'as_consumables', work_time, check_time) # check details at warehouse
                                 # if details at warehouse
                                 if as_check[0]:
                                     self.time_on_conveyor += config_data.time_interval  # add time to time on conveyor of car
                                     self.status = 'AS' # change car to assembly stage
-                                    parts_data.parts_dict['as_raw_materials'][0] -= parts_data.parts_dict['as_raw_materials'][2] # spend materials for a defective part and for the one that was used in production
-                                    parts_data.parts_dict['as_consumables'][0] -= parts_data.parts_dict['as_consumables'][2] # spend materials for a defective part and for the one that was used in production
+                                    parts_data.parts_dict['as_raw_materials'][0] -= parts_data.parts_dict['as_raw_materials'][3] # spend materials for a defective part and for the one that was used in production
+                                    parts_data.parts_dict['as_consumables'][0] -= parts_data.parts_dict['as_consumables'][3] # spend materials for a defective part and for the one that was used in production
                                 # if details aren't at warehouse
                                 else:
                                     conveyor.stop(parts_data, as_check[1]) # stop conveyor
                         # if no defect parts at assembly 
                         else:
                             # check if production have details at warehouse
-                            as_check = parts_data.check_pack('as_raw_materials', 'as_consumables')
+                            as_check = parts_data.check_pack('as_raw_materials', 'as_consumables', work_time, check_time)
                             # if production have details at warehouse
                             if as_check[0]:
                                 self.time_on_conveyor += config_data.time_interval  # add time on conveyor
                                 self.status = 'AS'  # set status
-                                parts_data.parts_dict['as_raw_materials'][0] -= parts_data.parts_dict['as_raw_materials'][2] # spend materials for a part and for that was used in production
-                                parts_data.parts_dict['as_consumables'][0] -= parts_data.parts_dict['as_consumables'][2] # spend materials for a part that was used in production
+                                parts_data.parts_dict['as_raw_materials'][0] -= parts_data.parts_dict['as_raw_materials'][3] # spend materials for a part and for that was used in production
+                                parts_data.parts_dict['as_consumables'][0] -= parts_data.parts_dict['as_consumables'][3] # spend materials for a part that was used in production
                             # if no details at warehouse
                             else:
                                 conveyor.stop(parts_data, as_check[1])   # stop conveyor

@@ -17,7 +17,7 @@ import time # use for naming logs files
 # Also, this class describes the production process itself.
 class manufacture(object):
     # class constructor
-    def __init__(self, env, conveyor, parts_data, config_data):
+    def __init__(self, env, conveyor, parts_data, config_data, operation_mode):
         self.env = env # this env uses to simulate production process (simpy module)
         self.conveyor = conveyor # exemplar of "conveyor" class
         self.parts_data = parts_data # exemplar of "parts_data" class
@@ -25,6 +25,7 @@ class manufacture(object):
         self.ready_cars = 0 # ready cars to sell
         self.time_days_production = -1 # number of days of production
         self.time_production = 0 # total production time
+        self.operation_mode = operation_mode
 
     # this function describes one production cycle
     def manufacture_interval(self):
@@ -58,7 +59,7 @@ class manufacture(object):
                 if self.conveyor.status() == False:
                     break
                 # edit data for every car
-                self.conveyor.cars_on_conveyor[iter].edit_data(self.parts_data, self.config_data, self.conveyor)      
+                self.conveyor.cars_on_conveyor[iter].edit_data(self.parts_data, self.config_data, self.conveyor, int(self.time_production), self.config_data.strategy_check_time)      
         # if conveyor is stop
         else:
             self.conveyor.edit_stop_time(self.config_data.time_interval, self.parts_data) # reduce the stop time by time interval from "config_data" class
@@ -70,12 +71,12 @@ class manufacture(object):
         path =  str(os.path.dirname(os.path.abspath('manufacture.py')))
         # if Linux or MAC OS system
         if sys.platform == 'darwin' or sys.platform == 'linux':
-            path += '/logs/'
+            path += '/logs/' + time.ctime()
         # if Windows system
         elif sys.platform == 'win32':
-            path += '\\logs\\'
+            path += '\\logs\\' + str(time.strptime(time.asctime()))
         # create a file into which production data will be logged for subsequent analysis
-        with open(path + 'logs' + ' ' + time.ctime() + '.txt', 'a+') as file:
+        with open(path + '.txt', 'a+') as file:
             with contextlib.redirect_stdout(file): # redirect the output to a log file
                 # for all interval
                 while (self.time_days_production / (self.config_data.change_time * 2 * 60)) < self.config_data.days_of_production:
@@ -96,7 +97,11 @@ class manufacture(object):
                         for iter in range(0, self.conveyor.numb_cars()):
                             self.conveyor.cars_on_conveyor[iter].print_data() # and print this data   
                         # save to file data about paassed days and released cars for every day
-                    print('\nAt this moment, passed {} days, released {} cars'.format(round(self.time_days_production / (self.config_data.change_time * 2 * 60)), self.ready_cars)) 
+                    print('\nAt this moment, passed {} days, released {} cars'.format(round(self.time_days_production / (self.config_data.change_time * 2 * 60)), self.ready_cars))
+                    # if use "Purchase at yesterday's costs" strategy
+                    if self.config_data.strategy == 'B':
+                        # buy parts that were used today
+                        self.parts_data.check_used_day_details(self.conveyor)                    
                     self.time_production = 0 # reset at the end of the day timer of work conveyor
                     print() # testing
     
@@ -105,9 +110,17 @@ class manufacture(object):
     def car_revenue(self, type_test='once'):
         # number of expected cars that usine need to product
         expected_cars = round((self.config_data.days_of_production * (self.config_data.change_time * 2) - (self.config_data.change_time * 2)) / (self.config_data.conveyor_length / (self.config_data.conveyor_speed * 1000)) * self.config_data.max_car)
-        # if we have a single modeling process, then print all data to command line
-        if type_test == 'once':
-            print('\nCars produced: {}, expected to produce: {}, performance ratio: {}'.format(self.ready_cars, expected_cars, (self.ready_cars / expected_cars)))
-        # if we have a complete simulation, then we return number of produced cars and perfomance ration of manufacture (for further calculations)
-        if type_test == 'full':
-            return (self.ready_cars, (self.ready_cars / expected_cars))
+        if self.operation_mode == 'command_line':
+            # if we have a single modeling process, then print all data to command line
+            if type_test == 'once':
+                print('\nCars produced: {}, expected to produce: {}, performance ratio: {}'.format(self.ready_cars, expected_cars, (self.ready_cars / expected_cars)))
+            # if we have a complete simulation, then we return number of produced cars and perfomance ration of manufacture (for further calculations)
+            if type_test == 'full':
+                return (self.ready_cars, (self.ready_cars / expected_cars))
+        elif self.operation_mode == 'gui':
+            # if we have a single modeling process, then print all data to command line
+            if type_test == 'once':
+                return (self.ready_cars, expected_cars, (self.ready_cars / expected_cars))
+            # if we have a complete simulation, then we return number of produced cars and perfomance ration of manufacture (for further calculations)
+            if type_test == 'full':
+                return (self.ready_cars, (self.ready_cars / expected_cars))
